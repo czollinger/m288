@@ -56,6 +56,7 @@
     let direction = 'right';
     let gameOver = false;
     let gameInterval;
+    let speed = 100;
 
     document.getElementById('startButton').addEventListener('click', startGame);
     document.getElementById('reloadButton').addEventListener('click', reloadPage);
@@ -63,7 +64,7 @@
     function startGame() {
         document.getElementById('startPage').style.display = 'none';
         canvas.style.display = 'block';
-        gameInterval = setInterval(draw, 100);
+        gameInterval = setInterval(draw, speed);
     }
 
     function reloadPage() {
@@ -118,6 +119,9 @@
     function eatFood() {
         food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
         ateFood = true;
+        speed -= 5; // Increase snake speed
+        clearInterval(gameInterval); // Clear previous interval
+        gameInterval = setInterval(draw, speed); // Set new interval with updated speed
     }
 
     let ateFood = false;
