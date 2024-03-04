@@ -42,10 +42,11 @@
 <div id="startPage">
     <h1>Snake Game</h1>
     <button id="startButton">Start</button>
-    <button id="reloadButton">Reload</button>
 </div>
 
 <canvas id="canvas" width="400" height="400"></canvas>
+
+<button id="reloadButton" style="display: none;">Reload</button>
 
 <script>
     const canvas = document.getElementById('canvas');
@@ -64,6 +65,7 @@
     function startGame() {
         document.getElementById('startPage').style.display = 'none';
         canvas.style.display = 'block';
+        document.getElementById('reloadButton').style.display = 'block';
         gameInterval = setInterval(draw, speed);
     }
 
