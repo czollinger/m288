@@ -53,21 +53,22 @@
     const ctx = canvas.getContext('2d');
     const box = 20;
     let snake = [{ x: 10 * box, y: 10 * box }];
-    let foods = []; // Array für verschiedene Bilder für das Futter
     let direction = 'right';
     let gameOver = false;
     let gameInterval;
     let speed = 100;
 
-    // Füge Bilder für das Futter hinzu
-    let foodImages = ['/pictures/cherry.png', 'cherry.png', 'cherry.png'];
+    // Load images
+    const snakeHeadImg = new Image();
+    snakeHeadImg.src = 'pictures/lara.jpg';
 
-    // Lade alle Bilder vor dem Start des Spiels
-    foodImages.forEach(image => {
-        let foodImage = new Image();
-        foodImage.src = image;
-        foods.push(foodImage);
-    });
+    const foodImgs = [
+        'pictures/food1.png',
+        'pictures/food2.png',
+        'pictures/food3.png'
+    ];
+
+    let foodImg = new Image();
 
     document.getElementById('startButton').addEventListener('click', startGame);
     document.getElementById('reloadButton').addEventListener('click', reloadGame);
@@ -77,6 +78,7 @@
         canvas.style.display = 'block';
         document.getElementById('reloadButton').style.display = 'block';
         gameInterval = setInterval(draw, speed);
+        setFoodImage();
     }
 
     function reloadGame() {
@@ -86,6 +88,7 @@
         speed = 100;
         clearInterval(gameInterval);
         gameInterval = setInterval(draw, speed);
+        setFoodImage();
     }
 
     function draw() {
@@ -96,23 +99,17 @@
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = 'green';
-        snake.forEach(segment => {
-            ctx.fillRect(segment.x, segment.y, box, box);
-        });
+        // Draw snake head
+        ctx.drawImage(snakeHeadImg, snake[0].x, snake[0].y, box, box);
 
-        drawFood();
+        // Draw food
+        ctx.drawImage(foodImg, food.x, food.y, box, box);
 
         moveSnake();
 
         if (snake[0].x === food.x && snake[0].y === food.y) {
             eatFood();
         }
-    }
-
-    function drawFood() {
-        ctx.fillStyle = 'red';
-        ctx.fillRect(food.x, food.y, box, box);
     }
 
     function moveSnake() {
@@ -123,37 +120,26 @@
         if (direction === 'down') head.y += box;
         if (direction === 'up') head.y -= box;
 
-        // Wenn die Schlange den Rand erreicht, ist das Spiel vorbei
         if (head.x >= canvas.width || head.x < 0 || head.y >= canvas.height || head.y < 0) {
             gameOver = true;
             return;
         }
 
         snake.unshift(head);
-
-        // Entferne das letzte Segment der Schlange, wenn sie kein Futter gefressen hat
-        if (!ateFood) {
-            snake.pop();
-        } else {
-            ateFood = false;
-        }
     }
 
     function eatFood() {
-        // Zufällig ein neues Futter auswählen
-        let randomIndex = Math.floor(Math.random() * foodImages.length);
-        food = {
-            x: Math.floor(Math.random() * 20) * box,
-            y: Math.floor(Math.random() * 20) * box,
-            image: foods[randomIndex]
-        };
-        ateFood = true;
+        food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
+        setFoodImage();
         speed -= 5; // Increase snake speed
         clearInterval(gameInterval); // Clear previous interval
         gameInterval = setInterval(draw, speed); // Set new interval with updated speed
     }
 
-    let ateFood = false;
+    function setFoodImage() {
+        let randomIndex = Math.floor(Math.random() * foodImgs.length);
+        foodImg.src = foodImgs[randomIndex];
+    }
 
     document.addEventListener('keydown', e => {
         if (e.key === 'ArrowRight' && direction !== 'left') direction = 'right';
