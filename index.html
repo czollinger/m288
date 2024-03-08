@@ -15,21 +15,21 @@
             background-color: #ffffff;
         }
         #canvas {
-            border: 2px solid #181818;
-            display: none;
+            border: 2px solid #171717;
+            display: none; /* Canvas zunächst unsichtbar machen */
         }
         #startPage {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #181818;
+            color: #171717;
         }
         button {
             margin: 10px;
             padding: 10px 20px;
             font-size: 16px;
-            background-color: #4CAF50;
+            background-color: #654caf;
             color: white;
             border: none;
             cursor: pointer;
@@ -44,51 +44,86 @@
     <button id="startButton">Start</button>
 </div>
 
-<canvas id="canvas" width="400" height="400"></canvas>
+<canvas id="canvas" width="600" height="600"></canvas>
 
 <button id="reloadButton" style="display: none;">Reload</button>
 
 <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    const box = 20;
+    const box = 30; // Größe einer Zelle
     let snake = [{ x: 10 * box, y: 10 * box }];
+    let food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
     let direction = 'right';
     let gameOver = false;
     let gameInterval;
-    let speed = 100;
+    let speed = 150; // Geschwindigkeit der Schlange
+    let score = 0;
 
     // Load images
     const snakeHeadImg = new Image();
-    snakeHeadImg.src = 'pictures/lara.jpg';
+    snakeHeadImg.src = 'pictures/lara.jpg'; // replace 'snake_head.png' with your actual image path
+
+ // Define the positions of the snake segments
+let snakeParts = [
+    { x: 10, y: 10 }, // Head
+    { x: 9, y: 10 },   // First body segment
+    { x: 8, y: 10 }    // Second body segment
+];
+
+// Move the snake head
+function moveSnake() {
+    // Insert logic to move the snake head here
+}
+
+// Update the positions of the other snake segments
+function updateSnake() {
+    for (let i = snakeParts.length - 1; i > 0; i--) {
+        snakeParts[i].x = snakeParts[i - 1].x;
+        snakeParts[i].y = snakeParts[i - 1].y;
+    }
+}
+
+// Add a new snake segment
+function addSnakePart() {
+    // Insert logic to add a new snake segment here
+}
+
+// Draw the snake
+function drawSnake() {
+    ctx.fillStyle = 'pink';
+    for (let i = 0; i < snakeParts.length; i++) {
+        let part = snakeParts[i];
+        ctx.fillRect(part.x * tileCount, part.y * tileCount, tileSize, tileSize);
+    }
+}
 
     const foodImgs = [
-        'pictures/gipfeli.jpg',
         'pictures/redbull.jpg',
-        'pictures/volvic.jpg'
+        'pictures/volvic.jpg',
+        'pictures/gipfeli.jpg',
+        // Add more image paths as needed
     ];
-
-    let foodImg = new Image();
 
     document.getElementById('startButton').addEventListener('click', startGame);
     document.getElementById('reloadButton').addEventListener('click', reloadGame);
 
     function startGame() {
-        document.getElementById('startPage').style.display = 'none';
-        canvas.style.display = 'block';
+        document.getElementById('startPage').style.display = 'none'; // Startseite ausblenden
+        canvas.style.display = 'block'; // Canvas sichtbar machen
         document.getElementById('reloadButton').style.display = 'block';
         gameInterval = setInterval(draw, speed);
-        setFoodImage();
     }
 
     function reloadGame() {
         gameOver = false;
         snake = [{ x: 10 * box, y: 10 * box }];
         direction = 'right';
-        speed = 100;
+        food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
+        speed = 150; // Zurücksetzen der Geschwindigkeit
+        score = 0;
         clearInterval(gameInterval);
         gameInterval = setInterval(draw, speed);
-        setFoodImage();
     }
 
     function draw() {
@@ -99,11 +134,19 @@
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        // Draw score
+        ctx.fillStyle = '#171717'; // Schriftfarbe auf #171717 ändern
+        ctx.font = '20px Arial';
+        ctx.fillText('Score: ' + score, 10, 20);
+
         // Draw snake head
         ctx.drawImage(snakeHeadImg, snake[0].x, snake[0].y, box, box);
 
         // Draw food
-        ctx.drawImage(foodImg, food.x, food.y, box, box);
+        const randomFoodIndex = Math.floor(Math.random() * foodImgs.length);
+        const randomFoodImg = new Image();
+        randomFoodImg.src = foodImgs[randomFoodIndex];
+        ctx.drawImage(randomFoodImg, food.x, food.y, box, box);
 
         moveSnake();
 
@@ -125,20 +168,23 @@
             return;
         }
 
-        snake.unshift(head);
-    }
+        // Prüfe, ob die Schlange das Essen isst
+        if (head.x === food.x && head.y === food.y) {
+            // Wenn die Schlange Essen isst, erzeuge neues Essen
+            food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
+            speed -= 5; // Erhöhe die Geschwindigkeit
+            score++; // Erhöhe den Score
 
-    function eatFood() {
-        food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
-        setFoodImage();
-        speed -= 5; // Increase snake speed
-        clearInterval(gameInterval); // Clear previous interval
-        gameInterval = setInterval(draw, speed); // Set new interval with updated speed
-    }
+            // Füge ein neues Segment zur Schlange hinzu
+            snake.push({});
+        } else {
+            // Verschiebe den Schwanz der Schlange, um ein Pixel nach vorne
+            snake.pop();
+            snake.unshift({});
+        }
 
-    function setFoodImage() {
-        let randomIndex = Math.floor(Math.random() * foodImgs.length);
-        foodImg.src = foodImgs[randomIndex];
+        // Aktualisiere die Position des Kopfes der Schlange
+        snake[0] = head;
     }
 
     document.addEventListener('keydown', e => {
