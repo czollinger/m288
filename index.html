@@ -13,6 +13,7 @@
             align-items: center;
             height: 100vh;
             background-color: #ffffff;
+            font-family: 'Geomanist';
         }
         #canvas {
             border: 2px solid #171717;
@@ -29,11 +30,12 @@
             margin: 10px;
             padding: 10px 20px;
             font-size: 16px;
-            background-color: #654caf;
+            background-color: #95c11f ;
             color: white;
             border: none;
             cursor: pointer;
             border-radius: 5px;
+            font-family: 'Geomanist';
         }
     </style>
 </head>
@@ -44,7 +46,8 @@
     <button id="startButton">Start</button>
 </div>
 
-<canvas id="canvas" width="600" height="600"></canvas>
+<canvas id="canvas" width="600" height="600">
+</canvas>
 
 <button id="reloadButton" style="display: none;">Reload</button>
 
@@ -194,6 +197,6 @@ function drawSnake() {
         if (e.key === 'ArrowUp' && direction !== 'down') direction = 'up';
     });
 </script>
-   
+
 </body>
 </html>
