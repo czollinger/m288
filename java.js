@@ -1,3 +1,5 @@
+// JavaScript-Code in java.js
+
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const box = 30;
@@ -76,16 +78,13 @@ function draw() {
 
     moveSnake();
 
-
     if (snake[0].x === food.x && snake[0].y === food.y) {
         eatFood();
     }
 }
 
-
 function moveSnake() {
     let head = { x: snake[0].x, y: snake[0].y };
-
 
     switch (direction) {
         case 'right':
@@ -102,16 +101,13 @@ function moveSnake() {
             break;
     }
 
-
     if (head.x >= canvas.width || head.x < 0 || head.y >= canvas.height || head.y < 0) {
         gameOver = true;
         updateHighscore();
         return;
     }
 
-
     snake.unshift(head);
-
 
     const snakeCollision = snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y);
     if (snakeCollision) {
@@ -119,7 +115,6 @@ function moveSnake() {
         updateHighscore();
         return;
     }
-
 
     if (head.x !== food.x || head.y !== food.y) {
         snake.pop();
@@ -143,7 +138,6 @@ function updateHighscore() {
 }
 
 document.addEventListener('keydown', e => {
-
     switch (e.key) {
         case 'ArrowRight':
             if (direction !== 'left') direction = 'right';
@@ -159,3 +153,12 @@ document.addEventListener('keydown', e => {
             break;
     }
 });
+
+// Funktionen playGameMusic und pauseGameMusic müssen noch definiert werden
+function playGameMusic() {
+    // Code zum Abspielen der Spiel-Musik
+}
+
+function pauseGameMusic() {
+    // Code zum Pausieren der Spiel-Musik
+}
