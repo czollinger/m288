@@ -1,0 +1,49 @@
+
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #ffffff;
+    font-family: 'Geomanist';
+}
+
+#canvas {
+    border: 2px solid #171717;
+    display: none;
+}
+
+#startPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #171717;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #95c11f;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-family: 'Geomanist';
+}
+
+#canvas {
+    position: relative;
+}
+
+.canvas-text {
+    position: absolute;
+    bottom: 20px; 
+    left: 6%; 
+    text-align: center;
+    width: 80%; 
+}
+

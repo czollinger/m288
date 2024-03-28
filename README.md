@@ -1,4 +1,5 @@
 DOKUMENTATION
+
 Ziel
 Wir (Catrina und Lara) hatten im Modul 288 die Aufgabe ein Spiel mit HTML und JavaScript zu entwerfen, welches funktioniert und mindestens 2 Seiten hatte. Entschieden hatten wir uns für ein Snake Game, welches Ein Gesicht eines LPs als Snake Kopf und unsere «Typischen» Snacks als die Felder zum Essen hatte.
 HTML-Struktur
