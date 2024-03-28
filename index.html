@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,10 +16,12 @@
             background-color: #ffffff;
             font-family: 'Geomanist';
         }
+
         #canvas {
             border: 2px solid #171717;
-            display: none; /* Canvas zunächst unsichtbar machen */
+            display: none;
         }
+
         #startPage {
             display: flex;
             flex-direction: column;
@@ -26,11 +29,12 @@
             justify-content: center;
             color: #171717;
         }
+
         button {
             margin: 10px;
             padding: 10px 20px;
             font-size: 16px;
-            background-color: #95c11f ;
+            background-color: #95c11f;
             color: white;
             border: none;
             cursor: pointer;
@@ -39,185 +43,206 @@
         }
     </style>
 </head>
+
 <body>
-    
-<div id="startPage">
-    <h1>Snake Game</h1>
-    <button id="startButton">Start</button>
-</div>
 
-<canvas id="canvas" width="600" height="600">
-</canvas>
+    <div id="startPage">
+        <h1>Snake Game</h1>
+        <button id="startButton">Start</button>
+    </div>
 
-<button id="reloadButton" style="display: none;">Reload</button>
-<div id="scoreContainer" style="display: none;">
-    <div id="scoreDisplay"></div>
-    <div id="highscoreDisplay"></div>
-</div>
+    <canvas id="canvas" width="600" height="600">
+    </canvas>
 
-<script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const box = 30; // Größe einer Zelle
-    let snake = [{ x: 10 * box, y: 10 * box }];
-    let food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
-    let direction = 'right';
-    let gameOver = false;
-    let gameInterval;
-    let speed = 150; // Geschwindigkeit der Schlange
-    let score = 0;
-    let highscore = localStorage.getItem('highscore') || 0;
+    <button id="reloadButton" style="display: none;">Reload</button>
+    <div id="scoreContainer" style="display: none;">
+        <div id="scoreDisplay"></div>
+        <div id="highscoreDisplay"></div>
+    </div>
 
-    const foodImgs = [
-        'pictures/redbull.jpg',
-        'pictures/cola.jpg',
-        'pictures/gipfeli.jpg',
-        'pictures/chips.png',
-    ];
+    <!-- Audio element for in-game music -->
+    <audio id="gameMusic" autoplay loop>
+        <source src="pictures/sweethomealabama.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 
-    document.getElementById('startButton').addEventListener('click', startGame);
-    document.getElementById('reloadButton').addEventListener('click', reloadGame);
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const box = 30;
+        let snake = [{ x: 10 * box, y: 10 * box }];
+        let food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
+        let direction = 'right';
+        let gameOver = false;
+        let gameInterval;
+        let speed = 150;
+        let score = 0;
+        let highscore = localStorage.getItem('highscore') || 0;
 
-    function startGame() {
-        document.getElementById('startPage').style.display = 'none'; // Startseite ausblenden
-        canvas.style.display = 'block'; // Canvas sichtbar machen
-        document.getElementById('reloadButton').style.display = 'block';
-        document.getElementById('scoreContainer').style.display = 'block';
-        gameInterval = setInterval(draw, speed);
-    }
+        const foodImgs = [
+            'pictures/redbull.jpg',
+            'pictures/cola.jpg',
+            'pictures/gipfeli.jpg',
+            'pictures/chips.png',
+        ];
 
-    function reloadGame() {
-        gameOver = false;
-        snake = [{ x: 10 * box, y: 10 * box }];
-        direction = 'right';
-        food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
-        speed = 150; // Zurücksetzen der Geschwindigkeit
-        score = 0;
-        clearInterval(gameInterval);
-        gameInterval = setInterval(draw, speed);
-    }
+        document.getElementById('startButton').addEventListener('click', startGame);
+        document.getElementById('reloadButton').addEventListener('click', reloadGame);
 
-    function draw() {
-    if (gameOver) {
-        clearInterval(gameInterval);
-        return;
-    }
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw score
-    ctx.fillStyle = '#171717'; // Schriftfarbe auf #171717 ändern
-    ctx.font = '20px Arial';
-    ctx.fillText('Score: ' + score, 10, 20);
-    ctx.fillText('Highscore: ' + highscore, 10, 50);
-
-    // Draw snake
-    snake.forEach((segment, index) => {
-        if (index === 0) {
-            const snakeHeadImg = new Image();
-            snakeHeadImg.src = 'pictures/lara.jpg'; // Pfade zu deinem Bild einfügen
-            ctx.drawImage(snakeHeadImg, segment.x, segment.y, box, box);
-        } else {
-            let color = '#95c11f'; // Farbe für den Rest der Schlange
-            ctx.fillStyle = color;
-            ctx.fillRect(segment.x, segment.y, box, box);
-        }
-    });
-
-    // Draw food
-    const randomFoodIndex = Math.floor(Math.random() * foodImgs.length);
-    const randomFoodImg = new Image();
-    randomFoodImg.src = foodImgs[randomFoodIndex];
-    ctx.drawImage(randomFoodImg, food.x, food.y, box, box);
-
-    moveSnake(); // Schlange bewegen
-
-    // Kollisionserkennung mit der Nahrung
-    if (snake[0].x === food.x && snake[0].y === food.y) {
-        eatFood();
-    }
-}
-
-
-    function moveSnake() {
-        let head = { x: snake[0].x, y: snake[0].y };
-
-        // Bewegung basierend auf der aktuellen Richtung
-        switch (direction) {
-            case 'right':
-                head.x += box;
-                break;
-            case 'left':
-                head.x -= box;
-                break;
-            case 'down':
-                head.y += box;
-                break;
-            case 'up':
-                head.y -= box;
-                break;
+        function startGame() {
+            document.getElementById('startPage').style.display = 'none';
+            canvas.style.display = 'block';
+            document.getElementById('reloadButton').style.display = 'block';
+            document.getElementById('scoreContainer').style.display = 'block';
+            playGameMusic(); // Start playing the game music
+            gameInterval = setInterval(draw, speed);
         }
 
-        // Kollisionserkennung mit den Wänden des Spielfelds
-        if (head.x >= canvas.width || head.x < 0 || head.y >= canvas.height || head.y < 0) {
-            gameOver = true;
-            updateHighscore();
-            return;
+        function reloadGame() {
+            gameOver = false;
+            snake = [{ x: 10 * box, y: 10 * box }];
+            direction = 'right';
+            food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
+            speed = 150;
+            score = 0;
+            clearInterval(gameInterval);
+            gameInterval = setInterval(draw, speed);
         }
 
-        // Erstellen eines neuen Kopfsegments an der neuen Position
-        snake.unshift(head);
+        function draw() {
+            if (gameOver) {
+                clearInterval(gameInterval);
+                pauseGameMusic(); // Pause the game music when the game ends
+                return;
+            }
 
-        // Kollisionserkennung mit dem eigenen Körper
-        const snakeCollision = snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y);
-        if (snakeCollision) {
-            gameOver = true;
-            updateHighscore();
-            return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw score
+            ctx.fillStyle = '#171717';
+            ctx.font = '20px Arial';
+            ctx.fillText('Score: ' + score, 10, 20);
+            ctx.fillText('Highscore: ' + highscore, 10, 50);
+
+            // Draw snake
+            snake.forEach((segment, index) => {
+                if (index === 0) {
+                    const snakeHeadImg = new Image();
+                    snakeHeadImg.src = 'pictures/lara.jpg';
+                    ctx.drawImage(snakeHeadImg, segment.x, segment.y, box, box);
+                } else {
+                    let color = '#95c11f';
+                    ctx.fillStyle = color;
+                    ctx.fillRect(segment.x, segment.y, box, box);
+                }
+            });
+
+            // Draw food
+            const randomFoodIndex = Math.floor(Math.random() * foodImgs.length);
+            const randomFoodImg = new Image();
+            randomFoodImg.src = foodImgs[randomFoodIndex];
+            ctx.drawImage(randomFoodImg, food.x, food.y, box, box);
+
+            moveSnake();
+
+
+            if (snake[0].x === food.x && snake[0].y === food.y) {
+                eatFood();
+            }
         }
 
-        // Wenn die Schlange kein Essen isst, entferne das Schwanzsegment
-        if (head.x !== food.x || head.y !== food.y) {
-            snake.pop();
+
+        function moveSnake() {
+            let head = { x: snake[0].x, y: snake[0].y };
+
+
+            switch (direction) {
+                case 'right':
+                    head.x += box;
+                    break;
+                case 'left':
+                    head.x -= box;
+                    break;
+                case 'down':
+                    head.y += box;
+                    break;
+                case 'up':
+                    head.y -= box;
+                    break;
+            }
+
+
+            if (head.x >= canvas.width || head.x < 0 || head.y >= canvas.height || head.y < 0) {
+                gameOver = true;
+                updateHighscore();
+                return;
+            }
+
+
+            snake.unshift(head);
+
+
+            const snakeCollision = snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y);
+            if (snakeCollision) {
+                gameOver = true;
+                updateHighscore();
+                return;
+            }
+
+
+            if (head.x !== food.x || head.y !== food.y) {
+                snake.pop();
+            }
         }
-    }
 
-    function eatFood() {
-        food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
-        score++;
-        if (score > highscore) {
-            highscore = score;
-            localStorage.setItem('highscore', highscore);
+        function eatFood() {
+            food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
+            score++;
+            if (score > highscore) {
+                highscore = score;
+                localStorage.setItem('highscore', highscore);
+            }
         }
-    }
 
-    function updateHighscore() {
-        if (score > highscore) {
-            highscore = score;
-            localStorage.setItem('highscore', highscore);
+        function updateHighscore() {
+            if (score > highscore) {
+                highscore = score;
+                localStorage.setItem('highscore', highscore);
+            }
         }
-    }
 
-    document.addEventListener('keydown', e => {
-    // Richtung der Schlange basierend auf den Pfeiltasten ändern
-    switch (e.key) {
-        case 'ArrowRight':
-            if (direction !== 'left') direction = 'right';
-            break;
-        case 'ArrowLeft':
-            if (direction !== 'right') direction = 'left';
-            break;
-        case 'ArrowDown':
-            if (direction !== 'up') direction = 'down';
-            break;
-        case 'ArrowUp':
-            if (direction !== 'down') direction = 'up';
-            break;
-    }
-});
+        document.addEventListener('keydown', e => {
 
+            switch (e.key) {
+                case 'ArrowRight':
+                    if (direction !== 'left') direction = 'right';
+                    break;
+                case 'ArrowLeft':
+                    if (direction !== 'right') direction = 'left';
+                    break;
+                case 'ArrowDown':
+                    if (direction !== 'up') direction = 'down';
+                    break;
+                case 'ArrowUp':
+                    if (direction !== 'down') direction = 'up';
+                    break;
+            }
+        });
 
-</script>
+        const gameMusic = document.getElementById('gameMusic');
+
+        // Function to start playing the game music
+        function playGameMusic() {
+            gameMusic.play();
+        }
+
+        // Function to pause the game music
+        function pauseGameMusic() {
+            gameMusic.pause();
+        }
+
+    </script>
 
 </body>
+
 </html>
